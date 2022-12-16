@@ -1,0 +1,49 @@
+.btn:focus, .input:focus, .btn:first-child:active,
+.btn-close:focus{
+    box-shadow: none;
+    border-color: transparent!important;
+    outline: none;
+}
+.btn.disabled{
+    border-color: transparent!important;
+}
+.folder-container {
+    border-right: 1px solid #dee2e6;
+    width: 20rem;
+    padding-top: 0.5rem;
+}
+.flat.btn:active, .flat.btn:hover{
+    background-color: #dee2e6;
+}
+.filter-container {
+    width: 420px;
+    cursor: not-allowed;
+}
+table thead tr th, table tbody tr td {
+    padding: 0.5rem;
+}
+.search-prefix {
+    position: relative;
+    width: 100%;
+}
+.search-prefix > input {
+    padding: 0.5rem 2.25rem;
+    width: 100%;
+    border: 1px solid #dee2e6;
+    background-color: transparent;
+}
+.search-prefix > .bi.bi-search {
+    position: absolute;
+    top: 0.425rem;
+    left: 13px;
+
+}
+.options {
+    position: relative;
+}
+.options .menu {
+    width: 10rem;
+    position: absolute;
+    right: 0;
+    z-index: 1;
+}
