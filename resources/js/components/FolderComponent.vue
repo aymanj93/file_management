@@ -3,7 +3,10 @@
         <div class="d-flex justify-content-between align-items-center">
             <button @click="toggleFolder(f)" class="btn p-0 mb-2">
                 <i v-if="f.children.length > 0" :class="[f.showFolder ? 'bi-chevron-down' : 'bi-chevron-right']" class="bi me-2"></i>
-                <i class="bi bi-folder me-1"></i>
+                <span v-if="f.children.length > 0">
+                    <i v-if="f.showFolder" class="bi bi-folder2-open"></i>
+                    <i v-else class="bi bi-folder me-1"></i>
+                </span>
                 {{f.name}}
             </button>
             <div class="options">
@@ -16,7 +19,7 @@
             </div>
         </div>
 
-        <div v-if="f.children && f.showFolder" class="ms-4">
+        <div v-if="f.children.length > 0 && f.showFolder" class="ms-4">
             <FolderComponent
                 :toggle-folder="toggleFolder"
                 :show-menu="showMenu"

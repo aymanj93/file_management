@@ -17,7 +17,7 @@
                     <td>aaaaaaa</td>
                     <td>-</td>
                     <td>16/01/2020</td>
-                    <td></td>
+                    <td>-</td>
                     <td>0</td>
                 </tr>
                 </tbody>
