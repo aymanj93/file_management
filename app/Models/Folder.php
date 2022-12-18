@@ -17,4 +17,9 @@ class Folder extends Model
     {
         return $this->hasMany(Folder::class, 'folder_id')->with('children');
     }
+
+    public function attachments()
+    {
+        return $this->hasMany(Attachment::class);
+    }
 }

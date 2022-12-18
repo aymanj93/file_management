@@ -6,7 +6,7 @@ namespace Tests\Feature;
 use App\Models\Folder;
 use Tests\TestCase;
 
-class ExampleTest extends TestCase
+class FolderApiTest extends TestCase
 {
     use RefreshDatabase;
 
