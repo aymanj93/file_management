@@ -1,6 +1,6 @@
 <template>
     <div class="pt-4 ps-3 w-100">
-        <div v-if="folder.id">
+        <div v-if="folder.name">
             <p class="text-secondary fw-bold" style="font-size: 12px;">{{folder.name}}</p>
             <table class="border w-100">
                 <thead class="bg-light">

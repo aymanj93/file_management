@@ -1,20 +1,21 @@
 <template>
-    <div class="d-flex flex-column" v-for="f in folders" :key="f.id">
+    <div class="d-flex flex-column folders" v-for="f in folders" :key="f.id">
         <div class="d-flex justify-content-between align-items-center">
             <button @click="toggleFolder(f)" class="btn p-0 mb-2">
                 <i v-if="f.children.length > 0" :class="[f.showFolder ? 'bi-chevron-down' : 'bi-chevron-right']" class="bi me-2"></i>
-                <span v-if="f.children.length > 0">
-                    <i v-if="f.showFolder" class="bi bi-folder2-open"></i>
+                    <i v-if="f.children.length > 0" :class="[f.showFolder ? 'bi-folder2-open' : 'bi-folder']" class="bi me-1"></i>
                     <i v-else class="bi bi-folder me-1"></i>
-                </span>
                 {{f.name}}
             </button>
             <div class="options">
                 <button :class="{'btn-light' : f.showMenu}" class="btn" @click="showMenu(f)"><i class="bi bi-three-dots"></i></button>
-                <div class="d-flex shadow flex-column bg-light menu" v-if="f.showMenu">
-                    <button @click="renameFolder(f)" class="btn text-start text-secondary">Rename Folder</button>
-                    <button @click="addSubFolder(f)" class="btn text-start text-success">Add Folder</button>
-                    <button class="btn text-start text-danger">Delete Folder</button>
+                <div v-if="f.showMenu" class="d-flex shadow flex-column bg-light menu">
+                    <button @click="renameFolder(f)" class="btn text-start text-secondary">
+                        Rename Folder
+                    </button>
+                    <button @click="addSubFolder(f)" class="btn text-start text-success">
+                        Add Sub Folder
+                    </button>
                 </div>
             </div>
         </div>

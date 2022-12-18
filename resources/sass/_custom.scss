@@ -46,4 +46,11 @@ table thead tr th, table tbody tr td {
     position: absolute;
     right: 0;
     z-index: 1;
+
+    .btn:hover {
+        background-color: #dee2e6;
+        border-radius: 0!important;
+    }
 }
+
+

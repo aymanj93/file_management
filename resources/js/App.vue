@@ -15,8 +15,8 @@
             <PreviewComponent :folder="selectedFolder"/>
         </div>
     </div>
-    <Modal :title="folderModal.title" v-model="folderModal.show">
-        <input v-model="folderModal.folderName" type="text" class="form-control my-3" placeholder="Folder name">
+    <Modal @save="saveModal(folderModalController)" :title="folderModal.title" v-model="folderModalController.show">
+        <input v-on:keyup.enter="saveModal(folderModalController)" v-model="folderModal.name" type="text" class="form-control text-center" placeholder="Folder name">
     </Modal>
 </template>
 
@@ -35,12 +35,19 @@ import Modal from "./elements/Modal.vue"
         },
         data() {
             return {
+                folderModalController: {
+                    hasChildren: false,
+                    show: false,
+                    node: {}
+                },
                 selectedFolder: {},
                 loadPage: true,
                 folderModal: {
-                    title: '',
-                    show: false,
-                    folderName: '',
+                    id: null,
+                    name: '',
+                    showFolder: false,
+                    showMenu: false,
+                    children: []
                 },
                 folders: [
                     {
@@ -93,22 +100,26 @@ import Modal from "./elements/Modal.vue"
         },
         methods: {
             addFolder (){
-                this.hideAllMenu(this.folders);
                 this.folderModal.title = 'Add new folder';
-                this.folderModal.folderName = '';
-                this.folderModal.show = true;
+                this.folderModal.name = '';
+
+                this.hideAllMenu(this.folders);
+                this.folderModalController.hasChildren = false;
+                this.folderModalController.node = this.folders;
+                this.folderModalController.show = true;
             },
             renameFolder (node){
-                this.hideAllMenu(this.folders);
-                this.folderModal.title = 'Rename folder';
-                this.folderModal.folderName = node.name;
-                this.folderModal.show = true;
+                this.folderModal.title = 'Rename this folder';
+                this.folderModal.name = node.name;
             },
             addSubFolder (node){
-                this.hideAllMenu(this.folders);
                 this.folderModal.title = 'Add sub folder';
-                this.folderModal.folderName = '';
-                this.folderModal.show = true;
+                this.folderModal.name = '';
+
+                this.hideAllMenu(this.folders);
+                this.folderModalController.hasChildren = true;
+                this.folderModalController.node = node;
+                this.folderModalController.show = true;
             },
             toggleFolder (node) {
                 this.selectedFolder = node;
@@ -137,6 +148,26 @@ import Modal from "./elements/Modal.vue"
                         this.hideAllMenu(branch.children);
                     }
                 });
+            },
+            saveModal(controller) {
+                (controller.hasChildren) ?
+                    controller.node.children.push({
+                        id: 10,
+                        name: this.folderModal.name,
+                        showFolder: false,
+                        showMenu: false,
+                        children: []
+                    }) :
+                    controller.node.push({
+                        id: 10,
+                        name: this.folderModal.name,
+                        showFolder: false,
+                        showMenu: false,
+                        children: []
+                    })
+
+                controller.node.showFolder = true;
+                controller.show = false;
             },
             async getFolderApi() {
                 setTimeout(()=>{
