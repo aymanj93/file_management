@@ -14,6 +14,7 @@ class FolderController extends Controller
     {
         $folders = Folder::whereNull('folder_id')
             ->with('children')
+            ->select('name')
             ->orderBy('name', 'asc')
             ->get();
 

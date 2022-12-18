@@ -41,6 +41,9 @@ class FolderApiTest extends TestCase
             $response = $this->post('api/folder/'.$root->id.'/createFolder', $folder->toArray());
             $response->assertCreated();
         }
+
+        $response = $this->get('api/folder');
+        $response->assertOk();
     }
 
 
