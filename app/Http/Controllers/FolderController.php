@@ -32,7 +32,7 @@ class FolderController extends Controller
     }
 
 
-    public function createFolder(int $id, StoreFolderRequest $request)
+    public function addFolder(int $id, StoreFolderRequest $request)
     {
         $request ->validated();
 

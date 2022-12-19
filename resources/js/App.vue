@@ -1,11 +1,11 @@
 <template>
     <Loading v-if="loadPage"/>
     <div v-else>
-        <FilterComponent :create-folder="createFolder"/>
+        <FilterComponent :create-folder="addFolder"/>
         <div class="d-flex justify-content-center px-5">
             <div class="folder-container">
                 <FolderComponent
-                    :preview="previewFiles"
+                    :preview="previewFilesApi"
                     :toggle-folder="toggleFolder"
                     :show-menu="showMenu"
                     :folders="this.folders"
@@ -20,22 +20,21 @@
         </div>
     </div>
 
-    <Modal @save="createFolderApi(folderModalController)"
-           :title="folderModal.title"
-           v-model="folderModalController.show"
-           :disabled="false">
-        <input v-on:keyup.enter="createFolderApi(folderModalController)" v-model="folderModal.name" type="text" class="form-control text-center" placeholder="Folder name" maxlength="100">
-        <p v-if="folderModalController.errors" class="fw-bold text-danger mt-1">Attachment name is required</p>
+    <Modal @save="addFolderApi(addFolderController)"
+           :title="addFolderController.title"
+           v-model="addFolderController.show"
+           :disabled="addFolderController.disabled">
+        <input v-on:keyup.enter="addFolderApi(addFolderController)" v-model="inputFolderName" type="text" class="form-control text-center" placeholder="Folder name" maxlength="100">
+<!--        <p v-if="addFolderController.errors" class="fw-bold text-danger mt-1">Attachment name is required</p>-->
     </Modal>
 
     <Modal @save="uploadFileApi(uploadFileController)"
            title="Upload File"
            v-model="uploadFileController.show"
-           :disabled="uploadFileController.maxSize">
+           :disabled="uploadFileController.disabled">
         <div class="form-group">
             <label class="form-label">File Name</label>
-            <input v-model="uploadFileController.name" type="text" class="form-control text-start" placeholder="File Name" maxlength="100">
-            <p v-if="uploadFileController.errors" class="fw-bold text-danger mt-1">Folder name is required</p>
+            <input v-model="inputFileName" type="text" class="form-control text-start" placeholder="File Name" maxlength="100">
         </div>
 
         <div class="form-group mt-3">
@@ -44,7 +43,8 @@
             <p class="text-muted mt-1 mb-0"><small>*File size must not exceed 5mb</small></p>
         </div>
 
-        <p v-if="uploadFileController.maxSize" class="fw-bold text-danger mt-1">Opps, this file is too big. Please choose a different file.</p>
+        <p v-if="uploadFileController.fileEmpty" class="fw-bold text-danger mt-1">Please upload file</p>
+        <p v-else-if="uploadFileController.maxSize" class="fw-bold text-danger mt-1">Opps, this file is too big. Please choose a different file.</p>
     </Modal>
 </template>
 
@@ -64,58 +64,83 @@ export default {
     },
     data() {
         return {
+            addFolderController: {
+                title: '',
+                name: '',
+                type: '',
+                show: false,
+                node: {},
+                errors: null,
+                disabled: true,
+            },
             uploadFileController: {
                 show: false,
                 id: null,
                 name: '',
                 file: null,
                 maxSize: false,
+                fileEmpty: false,
+                disabled: true,
                 errors: null,
             },
-            folderModalController: {
-                type: '',
-                show: false,
-                node: {},
-                errors: null,
-            },
+            folders: [],
             selectedFolder: {},
             loadPage: true,
             loadPreview: false,
-            folderModal: {
-                id: null,
-                name: '',
-            },
-            folders: [],
+            inputFileName: '',
+            inputFolderName: ''
+        }
+    },
+    created() {
+        this.getFolderApi();
+    },
+    watch: {
+        inputFolderName(newValue, oldValue) {
+            if (newValue === '' ) {
+                this.addFolderController.disabled = true;
+            } else {
+                this.addFolderController.name = newValue;
+                this.addFolderController.disabled = false;
+            }
+        },
+        inputFileName(newValue, oldValue) {
+            if (newValue === '' ) {
+                this.uploadFileController.disabled = true;
+            } else {
+                this.uploadFileController.name = newValue;
+                this.uploadFileController.disabled = false;
+            }
         }
     },
     methods: {
-        createFolder (){
-            this.folderModal.title = 'Add new folder';
-            this.folderModal.name = '';
-
+        addFolder(){
             this.hideAllMenu(this.folders);
-            this.folderModalController.type = 'folder';
-            this.folderModalController.node = this.folders;
-            this.folderModalController.show = true;
-            this.folderModalController.errors = null;
+            this.inputFolderName = '';
+
+            this.addFolderController.title = 'Add new folder';
+            this.addFolderController.type = 'folder';
+            this.addFolderController.node = this.folders;
+            this.addFolderController.show = true;
+            this.addFolderController.errors = null;
         },
         addSubFolder (node){
-            this.folderModal.title = 'Add sub folder';
-            this.folderModal.name = '';
-
             this.hideAllMenu(this.folders);
-            this.folderModalController.type = 'child';
-            this.folderModalController.node = node;
-            this.folderModalController.show = true;
-            this.folderModalController.errors = null;
+            this.inputFolderName = '';
+
+            this.addFolderController.title = 'Add sub folder';
+            this.addFolderController.type = 'child';
+            this.addFolderController.node = node;
+            this.addFolderController.show = true;
+            this.addFolderController.errors = null;
         },
         uploadFile(id) {
-            this.uploadFileController.id = id;
-            this.uploadFileController.name = '';
             this.$refs.file.value = null;
-            this.uploadFileController.show = true;
+            this.inputFileName = '';
 
+            this.uploadFileController.id = id;
+            this.uploadFileController.show = true;
             this.uploadFileController.maxSize = false;
+            this.uploadFileController.fileEmpty = false;
             this.uploadFileController.errors = null;
         },
         showMenu(node) {
@@ -146,8 +171,10 @@ export default {
 
             if (file.size > 5242880) {
                 this.uploadFileController.maxSize = true;
+                this.uploadFileController.disabled = true;
             } else {
                 this.uploadFileController.maxSize = false;
+                this.uploadFileController.disabled = false;
                 this.uploadFileController.file = this.$refs.file.files[0];
             }
         },
@@ -156,7 +183,7 @@ export default {
             node.showFolder = !node.showFolder;
 
         },
-        async previewFiles(node){
+        async previewFilesApi(node){
             if (node.apiCall) {
                 this.selectedFolder = node;
             }
@@ -180,10 +207,11 @@ export default {
                     this.loadPage = false;
                 });
         },
-        async createFolderApi(controller) {
+        async addFolderApi(controller) {
             if (controller.type === 'folder') {
                 let formData = new FormData();
-                formData.append('name', this.folderModal.name);
+                formData.append('name', controller.name);
+
                 await $api.post('/api/folder', formData)
                     .then(response => {
                         controller.node.push({
@@ -203,11 +231,11 @@ export default {
                     });
             }
             if (controller.type === 'child') {
-                let folder_id = this.folderModalController.node.id;
+                let folder_id = controller.node.id;
                 let formData = new FormData();
-                formData.append('name', this.folderModal.name);
+                formData.append('name', controller.name);
 
-                await $api.post('/api/folder/' + folder_id + '/createFolder', formData)
+                await $api.post('/api/folder/' + folder_id + '/addFolder', formData)
                     .then(response => {
                         controller.node.children.push({
                             id: response.data.id,
@@ -228,26 +256,27 @@ export default {
             }
         },
         async uploadFileApi(controller) {
-            let formData = new FormData();
-            formData.append('name', controller.name);
-            if (controller.file !== undefined) {
+            if (controller.file == null) {
+                this.uploadFileController.fileEmpty = true;
+                this.uploadFileController.disabled = true;
+            } else {
+                let formData = new FormData();
+                formData.append('name', controller.name);
                 formData.append('file', controller.file);
+
+
+                await $api.post('/api/folder/' + controller.id, formData,
+                ).then(response => {
+
+                    this.selectedFolder.attachment.push(response.data.data);
+                    controller.show = false;
+
+                }).catch(err => {
+                    controller.errors = err.response.data.errors;
+                });
+
             }
-
-            await $api.post('/api/folder/' + controller.id, formData,
-            ).then(response => {
-
-                this.selectedFolder.attachment.push(response.data.data);
-                controller.show = false;
-
-            }).catch(err => {
-                controller.errors = err.response.data.errors;
-            });
-
         }
-    },
-    created() {
-        this.getFolderApi();
-    },
+    }
 }
 </script>
