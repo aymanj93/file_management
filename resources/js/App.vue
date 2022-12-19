@@ -1,7 +1,7 @@
 <template>
     <Loading v-if="loadPage"/>
     <div v-else>
-        <FilterComponent :create-folder="addFolder"/>
+        <FilterComponent :create-folder="createFolder"/>
         <div class="d-flex justify-content-center px-5">
             <div class="folder-container">
                 <FolderComponent
@@ -15,8 +15,9 @@
             <PreviewComponent :folder="selectedFolder"/>
         </div>
     </div>
-    <Modal @save="saveModal(folderModalController)" :title="folderModal.title" v-model="folderModalController.show">
-        <input v-on:keyup.enter="saveModal(folderModalController)" v-model="folderModal.name" type="text" class="form-control text-center" placeholder="Folder name">
+    <Modal @save="saveFolderModal(folderModalController)" :title="folderModal.title" v-model="folderModalController.show">
+        <input v-on:keyup.enter="saveFolderModal(folderModalController)" v-model="folderModal.name" type="text" class="form-control text-center" placeholder="Folder name">
+        <span v-if="errorController.isError" class="text-danger">{{ errorController.message }}</span>
     </Modal>
 </template>
 
@@ -25,6 +26,7 @@ import FilterComponent from "./components/FilterComponent.vue";
 import FolderComponent from "./components/FolderComponent.vue";
 import PreviewComponent from "./components/PreviewComponent.vue";
 import Modal from "./elements/Modal.vue"
+import $api from "./api";
 
     export default {
         components: {
@@ -36,7 +38,7 @@ import Modal from "./elements/Modal.vue"
         data() {
             return {
                 folderModalController: {
-                    hasChildren: false,
+                    type: '',
                     show: false,
                     node: {}
                 },
@@ -49,62 +51,20 @@ import Modal from "./elements/Modal.vue"
                     showMenu: false,
                     children: []
                 },
-                folders: [
-                    {
-                        id: 1,
-                        name: 'root 1',
-                        showFolder: false,
-                        showMenu: false,
-                        children: [
-                            {
-                                id: 2,
-                                name: 'sub folder',
-                                showFolder: false,
-                                showMenu: false,
-                                children: []
-                            },
-                            {
-                                id: 3,
-                                name: 'sub folder s2',
-                                showFolder: false,
-                                showMenu: false,
-                                children: []
-                            }
-                        ]
-                    },
-                    {
-                        id: 4,
-                        name: 'root 1',
-                        showFolder: false,
-                        showMenu: false,
-                        children: [
-                            {
-                                id: 5,
-                                name: 'sub folder',
-                                showFolder: false,
-                                showMenu: false,
-                                children: []
-                            },
-                            {
-                                id: 6,
-                                name: 'sub folder s2',
-                                showFolder: false,
-                                showMenu: false,
-                                children: []
-                            }
-                        ]
-                    }
-
-                ]
+                folders: [],
+                errorController: {
+                    message: '',
+                    isError: false,
+                }
             }
         },
         methods: {
-            addFolder (){
+            createFolder (){
                 this.folderModal.title = 'Add new folder';
                 this.folderModal.name = '';
 
                 this.hideAllMenu(this.folders);
-                this.folderModalController.hasChildren = false;
+                this.folderModalController.type = 'folder';
                 this.folderModalController.node = this.folders;
                 this.folderModalController.show = true;
             },
@@ -117,7 +77,7 @@ import Modal from "./elements/Modal.vue"
                 this.folderModal.name = '';
 
                 this.hideAllMenu(this.folders);
-                this.folderModalController.hasChildren = true;
+                this.folderModalController.type = 'child';
                 this.folderModalController.node = node;
                 this.folderModalController.show = true;
             },
@@ -149,31 +109,66 @@ import Modal from "./elements/Modal.vue"
                     }
                 });
             },
-            saveModal(controller) {
-                (controller.hasChildren) ?
-                    controller.node.children.push({
-                        id: 10,
-                        name: this.folderModal.name,
-                        showFolder: false,
-                        showMenu: false,
-                        children: []
-                    }) :
-                    controller.node.push({
-                        id: 10,
-                        name: this.folderModal.name,
-                        showFolder: false,
-                        showMenu: false,
-                        children: []
-                    })
+            async saveFolderModal(controller) {
+                if (controller.type === 'folder') {
+                    let formData = new FormData();
+                    formData.append('name', this.folderModal.name);
+                    await $api.post('/api/folder', formData)
+                        .then(response => {
+                            this.errorController.isError = false;
 
-                controller.node.showFolder = true;
-                controller.show = false;
+                            controller.node.push({
+                                id: response.data.id,
+                                name: response.data.name,
+                                showFolder: false,
+                                showMenu: false,
+                                children: []
+                            });
+
+                            controller.node.showFolder = true;
+                            controller.show = false;
+                        }).catch(err => {
+                            this.errorController.isError = true;
+                            this.errorController.message = err.response.data.message;
+                        });
+
+                }
+
+                if (controller.type === 'child') {
+                    let folder_id = this.folderModalController.node.id;
+                    let formData = new FormData();
+                    formData.append('name', this.folderModal.name);
+
+                    await $api.post('/api/folder/' + folder_id + '/createFolder', formData)
+                        .then(response => {
+                            this.errorController.isError = false;
+
+                            controller.node.children.push({
+                                id: response.data.id,
+                                name: response.data.name,
+                                showFolder: false,
+                                showMenu: false,
+                                children: []
+                            });
+
+                            controller.node.showFolder = true;
+                            controller.show = false;
+
+                        }).catch(err => {
+                            this.errorController.isError = true;
+                            this.errorController.message = err.response.data.message;
+                        });
+                }
+
+
             },
             async getFolderApi() {
-                setTimeout(()=>{
-                    this.loadPage = false;
-                }, 1500);
-            }
+                await $api.get('/api/folder')
+                    .then(response => {
+                        this.folders = response.data.data;
+                        this.loadPage = false;
+                    });
+            },
         },
         created() {
             this.getFolderApi();

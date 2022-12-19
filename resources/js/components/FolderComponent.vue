@@ -1,4 +1,5 @@
 <template>
+    <p v-if="folders.length === 0" class="text-muted mt-1"><i class="bi bi-folder-x"></i> There are no folders here</p>
     <div class="d-flex flex-column folders" v-for="f in folders" :key="f.id">
         <div class="d-flex justify-content-between align-items-center">
             <button @click="toggleFolder(f)" class="btn p-0 mb-2">

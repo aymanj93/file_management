@@ -14,7 +14,7 @@ class FolderController extends Controller
     {
         $folders = Folder::whereNull('folder_id')
             ->with('children')
-            ->select('name')
+            ->select('id','name')
             ->orderBy('name', 'asc')
             ->get();
 
@@ -26,15 +26,13 @@ class FolderController extends Controller
     {
         $request->validated();
 
-        $folder = Folder::create([
-            'name' => $request->get('name')
-        ]);
+        $folder = Folder::create($request->toArray());
 
         return response()->json($folder,201);
     }
 
 
-    public function createFolder(int $id,StoreFolderRequest $request)
+    public function createFolder(int $id, StoreFolderRequest $request)
     {
         $request ->validated();
 

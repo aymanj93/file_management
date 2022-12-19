@@ -13,7 +13,7 @@ class FolderResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'children' => FolderResource::collection($this->whenLoaded('children')),
+            'children' => FolderResource::collection($this->whenLoaded('children')) ?? [],
         ];
     }
 }
