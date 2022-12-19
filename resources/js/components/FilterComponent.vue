@@ -2,7 +2,7 @@
     <div class="d-block d-md-flex flex-row px-5 pt-5">
         <div class="search-prefix">
             <i class="bi bi-search"></i>
-            <input class="mb-1 mb-md-0" type="text" placeholder="Search...">
+            <input class="mb-1 mb-md-0" type="text" placeholder="Search..." disabled style="cursor: not-allowed;">
         </div>
         <div class="filter-container d-flex justify-content-center bg-white border mx-md-1 mb-1 mb-md-0">
             <button class="btn disabled fw-bold w-100 border-end"><i class="bi bi-funnel me-2"></i>Filter By</button>

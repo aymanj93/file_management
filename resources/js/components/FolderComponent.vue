@@ -2,7 +2,7 @@
     <p v-if="folders.length === 0" class="text-muted mt-1"><i class="bi bi-folder-x"></i> There are no folders here</p>
     <div class="d-flex flex-column folders" v-for="f in folders" :key="f.id">
         <div class="d-flex justify-content-between align-items-center">
-            <button @click="toggleFolder(f)" class="btn p-0 mb-2">
+            <button @click="toggleFolder(f)" class="btn text-truncate p-0 mb-2">
                 <i v-if="f.children.length > 0" :class="[f.showFolder ? 'bi-chevron-down' : 'bi-chevron-right']" class="bi me-2"></i>
                     <i v-if="f.children.length > 0" :class="[f.showFolder ? 'bi-folder2-open' : 'bi-folder']" class="bi me-1"></i>
                     <i v-else class="bi bi-folder me-1"></i>
@@ -23,7 +23,6 @@
                 :toggle-folder="toggleFolder"
                 :show-menu="showMenu"
                 :folders="f.children"
-                :rename-folder="renameFolder"
                 :add-sub-folder="addSubFolder"
             />
         </div>
@@ -38,7 +37,6 @@ export default {
         folders: Object,
         toggleFolder: Function,
         showMenu: Function,
-        renameFolder: Function,
         addSubFolder: Function,
     },
 }
