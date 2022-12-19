@@ -11,9 +11,6 @@
             <div class="options">
                 <button :class="{'btn-light' : f.showMenu}" class="btn" @click="showMenu(f)"><i class="bi bi-three-dots"></i></button>
                 <div v-if="f.showMenu" class="d-flex shadow flex-column bg-light menu">
-                    <button @click="renameFolder(f)" class="btn text-start text-secondary">
-                        Rename Folder
-                    </button>
                     <button @click="addSubFolder(f)" class="btn text-start text-success">
                         Add Sub Folder
                     </button>

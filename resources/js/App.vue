@@ -12,7 +12,10 @@
                     :add-sub-folder="addSubFolder"
                 />
             </div>
-            <PreviewComponent :folder="selectedFolder"/>
+            <PreviewComponent
+                :load-preview="loadPreview"
+                :folder="selectedFolder"
+            />
         </div>
     </div>
     <Modal @save="saveFolderModal(folderModalController)" :title="folderModal.title" v-model="folderModalController.show">
@@ -44,12 +47,10 @@ import $api from "./api";
                 },
                 selectedFolder: {},
                 loadPage: true,
+                loadPreview: false,
                 folderModal: {
                     id: null,
                     name: '',
-                    showFolder: false,
-                    showMenu: false,
-                    children: []
                 },
                 folders: [],
                 errorController: {
@@ -81,10 +82,27 @@ import $api from "./api";
                 this.folderModalController.node = node;
                 this.folderModalController.show = true;
             },
-            toggleFolder (node) {
-                this.selectedFolder = node;
-                node.showFolder = !node.showFolder;
+            async toggleFolder (node) {
+                this.loadPreview = true;
                 this.hideAllMenu(this.folders);
+
+                if (node.showFolder) {
+                    node.showFolder = false;
+                    this.selectedFolder = node;
+                    this.loadPreview = false;
+                } else {
+                    await $api.get('/api/folder/' + node.id)
+                        .then(response => {
+                            console.log(response.data.data);
+                            node['attachment'] = response.data.data;
+                            this.selectedFolder = node;
+                            this.loadPreview = false;
+                            node.showFolder = true;
+                        });
+                }
+
+
+
             },
             showMenu(node) {
                 this.toggleMenu(this.folders, node);
@@ -122,7 +140,8 @@ import $api from "./api";
                                 name: response.data.name,
                                 showFolder: false,
                                 showMenu: false,
-                                children: []
+                                children: [],
+                                attachment: []
                             });
 
                             controller.node.showFolder = true;
@@ -148,7 +167,8 @@ import $api from "./api";
                                 name: response.data.name,
                                 showFolder: false,
                                 showMenu: false,
-                                children: []
+                                children: [],
+                                attachment: []
                             });
 
                             controller.node.showFolder = true;
