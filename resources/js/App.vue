@@ -5,6 +5,7 @@
         <div class="d-flex justify-content-center px-5">
             <div class="folder-container">
                 <FolderComponent
+                    :preview="previewFiles"
                     :toggle-folder="toggleFolder"
                     :show-menu="showMenu"
                     :folders="this.folders"
@@ -87,13 +88,6 @@ export default {
             folders: [],
         }
     },
-    validations() {
-        return {
-            folderModal: {
-                name: { required },
-            },
-        }
-    },
     methods: {
         createFolder (){
             this.folderModal.title = 'Add new folder';
@@ -157,21 +151,25 @@ export default {
                 this.uploadFileController.file = this.$refs.file.files[0];
             }
         },
-        async toggleFolder (node) {
-            this.loadPreview = true;
+        toggleFolder (node) {
             this.hideAllMenu(this.folders);
+            node.showFolder = !node.showFolder;
 
-            if (node.showFolder) {
-                node.showFolder = false;
+        },
+        async previewFiles(node){
+            if (node.apiCall) {
                 this.selectedFolder = node;
-                this.loadPreview = false;
-            } else {
+            }
+            else{
+                this.loadPreview = true;
                 await $api.get('/api/folder/' + node.id)
                     .then(response => {
-                        node['attachment'] = response.data.data;
+                        console.log('api call');
                         this.selectedFolder = node;
                         this.loadPreview = false;
-                        node.showFolder = true;
+                        node['attachment'] = response.data.data;
+                        node.apiCall = true;
+                        node.showFolder = !node.showFolder;
                     });
             }
         },
@@ -193,6 +191,7 @@ export default {
                             name: response.data.name,
                             showFolder: false,
                             showMenu: false,
+                            apiCall: false,
                             children: [],
                             attachment: []
                         });
@@ -215,6 +214,7 @@ export default {
                             name: response.data.name,
                             showFolder: false,
                             showMenu: false,
+                            apiCall: false,
                             children: [],
                             attachment: []
                         });
