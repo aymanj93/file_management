@@ -164,7 +164,7 @@ export default {
                 this.loadPreview = true;
                 await $api.get('/api/folder/' + node.id)
                     .then(response => {
-                        console.log('api call');
+                        console.log('show attachments api call once');
                         this.selectedFolder = node;
                         this.loadPreview = false;
                         node['attachment'] = response.data.data;

@@ -2,7 +2,7 @@
     <p v-if="folders.length === 0" class="text-muted mt-1"><i class="bi bi-folder-x"></i> There are no folders here</p>
     <div class="d-flex flex-column folders" v-for="f in folders" :key="f.id">
         <div class="d-flex justify-content-between align-items-center">
-            <button @click="preview(f)" class="btn text-truncate p-0 mb-2">
+            <button v-on:dblclick="toggleFolder(f)" @click="preview(f)" class="btn text-truncate p-0 mb-2">
                 <i v-if="f.children.length > 0" @click="toggleFolder(f)"
                    :class="[f.showFolder ? 'bi-chevron-down' : 'bi-chevron-right']" class="bi me-2">
                 </i>
