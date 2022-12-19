@@ -2,21 +2,28 @@
 
 namespace Tests\Feature;
 
+use App\Models\Attachment;
+use App\Models\Folder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
 use Tests\TestCase;
 
 class AttachmentApiTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     *
-     * @return void
-     */
-    public function test_example()
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+    public function testGetAllAttachmentFromFolderIdApi() {
+        $folder = Folder::factory()->create();
+        $response = $this->get('api/folder/'.$folder->id);
+        $response->assertOk();
     }
+
+    public function testUploadFiftyAttachmentApi() {
+        $folder = Folder::factory()->create();
+        for ($i = 1; $i <= 50; $i++ )
+        {
+            $attachment = Attachment::factory()->create();
+            $response = $this->post('api/folder/'.$folder->id, $attachment->toArray());
+            $response->assertCreated();
+        }
+    }
+
 }

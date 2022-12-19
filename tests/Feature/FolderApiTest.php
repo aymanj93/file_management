@@ -10,7 +10,7 @@ class FolderApiTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function testCreateFolderWithoutName(){
+    public function testCreateFolderWithoutNameApi(){
         $folder = Folder::create([
             'name' => ''
         ]);
@@ -18,7 +18,7 @@ class FolderApiTest extends TestCase
         $response->assertInvalid();
     }
 
-    public function testCreateTenThousandFolder(){
+    public function testGetTenThousandFolderApi(){
         Folder::factory()->count(10000)->create();
         $response = $this->get('api/folder');
         $response->assertOk();

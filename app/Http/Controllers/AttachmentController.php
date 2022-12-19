@@ -4,83 +4,25 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreAttachmentRequest;
 use App\Http\Requests\UpdateAttachmentRequest;
+use App\Http\Resources\AttachmentResource;
 use App\Models\Attachment;
 
 class AttachmentController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function index()
-    {
-        //
+    public function index(int $id) {
+        $attachments = Attachment::where('folder_id', $id)->get();
+        return AttachmentResource::collection($attachments);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
+    public function store(int $id, StoreAttachmentRequest $request){
+        $request->validated();
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \App\Http\Requests\StoreAttachmentRequest  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(StoreAttachmentRequest $request)
-    {
-        //
-    }
+        $attachment = Attachment::create([
+            'folder_id' => $id,
+            'name' => $request->get('name'),
+            'path' => $request->get('path'),
+        ]);
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Attachment  $attachment
-     * @return \Illuminate\Http\Response
-     */
-    public function show(Attachment $attachment)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Attachment  $attachment
-     * @return \Illuminate\Http\Response
-     */
-    public function edit(Attachment $attachment)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \App\Http\Requests\UpdateAttachmentRequest  $request
-     * @param  \App\Models\Attachment  $attachment
-     * @return \Illuminate\Http\Response
-     */
-    public function update(UpdateAttachmentRequest $request, Attachment $attachment)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Attachment  $attachment
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(Attachment $attachment)
-    {
-        //
+        return response()->json($attachment, 201);
     }
 }

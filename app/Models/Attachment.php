@@ -11,7 +11,8 @@ class Attachment extends Model
 
     protected $fillable = [
         'name',
-        'folder_id'
+        'folder_id',
+        'path'
     ];
 
     public function folder() {

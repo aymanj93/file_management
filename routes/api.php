@@ -17,6 +17,11 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/folder', [FolderController::class, 'index']);
 Route::post('/folder', [FolderController::class, 'store']);
+
+Route::get('/folder/{id}', [AttachmentController::class, 'index']);
+Route::post('/folder/{id}', [AttachmentController::class, 'store']);
+
 Route::post('/folder/{id}/createFolder', [FolderController::class, 'createFolder']);
+
 
 
