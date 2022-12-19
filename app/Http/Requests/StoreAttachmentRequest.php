@@ -2,10 +2,12 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 
 class StoreAttachmentRequest extends FormRequest
 {
+    public $validator = null;
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -25,7 +27,13 @@ class StoreAttachmentRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'path' => 'nullable'
+            'path' => 'nullable',
+            'file' => 'required|mimes:pdf|max:5120',
         ];
+    }
+
+    protected function failedValidation(Validator $validator)
+    {
+        $this->validator = $validator;
     }
 }

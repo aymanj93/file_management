@@ -15,12 +15,25 @@
             <PreviewComponent
                 :load-preview="loadPreview"
                 :folder="selectedFolder"
+                :upload-file="uploadFile"
             />
         </div>
     </div>
     <Modal @save="saveFolderModal(folderModalController)" :title="folderModal.title" v-model="folderModalController.show">
         <input v-on:keyup.enter="saveFolderModal(folderModalController)" v-model="folderModal.name" type="text" class="form-control text-center" placeholder="Folder name">
         <span v-if="errorController.isError" class="text-danger">{{ errorController.message }}</span>
+    </Modal>
+
+    <Modal @save="saveUploadFileModal(uploadFileController)" title="Upload File" v-model="uploadFileController.show">
+        <div class="form-group">
+            <label class="form-label">File Name</label>
+            <input v-model="uploadFileController.name" type="text" class="form-control text-start" placeholder="File Name">
+        </div>
+
+        <div class="form-group mt-3 mb-4">
+            <label class="form-label w-100">Upload File</label>
+            <input type="file" @change="handleFileUpload($event)" ref="file">
+        </div>
     </Modal>
 </template>
 
@@ -40,6 +53,12 @@ import $api from "./api";
         },
         data() {
             return {
+                uploadFileController: {
+                    show: false,
+                    id: null,
+                    name: '',
+                    file: {},
+                },
                 folderModalController: {
                     type: '',
                     show: false,
@@ -93,16 +112,18 @@ import $api from "./api";
                 } else {
                     await $api.get('/api/folder/' + node.id)
                         .then(response => {
-                            console.log(response.data.data);
                             node['attachment'] = response.data.data;
                             this.selectedFolder = node;
                             this.loadPreview = false;
                             node.showFolder = true;
                         });
                 }
-
-
-
+            },
+            uploadFile(id) {
+                this.uploadFileController.id = id;
+                this.uploadFileController.name = '';
+                this.uploadFileController.file = {};
+                this.uploadFileController.show = true;
             },
             showMenu(node) {
                 this.toggleMenu(this.folders, node);
@@ -126,6 +147,9 @@ import $api from "./api";
                         this.hideAllMenu(branch.children);
                     }
                 });
+            },
+            handleFileUpload(event) {
+              this.uploadFileController.file = event.target.files[0];
             },
             async saveFolderModal(controller) {
                 if (controller.type === 'folder') {
@@ -179,8 +203,6 @@ import $api from "./api";
                             this.errorController.message = err.response.data.message;
                         });
                 }
-
-
             },
             async getFolderApi() {
                 await $api.get('/api/folder')
@@ -189,36 +211,27 @@ import $api from "./api";
                         this.loadPage = false;
                     });
             },
+            async saveUploadFileModal(controller) {
+
+                let formData = new FormData();
+                formData.append('name', controller.name);
+                if (controller.file !== undefined) {
+                    formData.append('file', controller.file);
+                }
+
+                await $api.post('/api/folder/' + controller.id, formData,
+                    ).then(response => {
+                        console.log(response.data.data);
+                        this.selectedFolder.attachment.push(response.data.data);
+                        controller.show = false;
+
+                    }).catch(err => {
+
+                    });
+            }
         },
         created() {
             this.getFolderApi();
         }
     }
 </script>
-
-<style scoped>
-:deep(.modal-container) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-:deep(.modal-content) {
-    display: flex;
-    flex-direction: column;
-    margin: 0 1rem;
-    padding: 1rem;
-    border: 1px solid #e2e8f0;
-    border-radius: 0.25rem;
-    background: #fff;
-    width: auto;
-
-}
-.modal__title {
-    font-size: 1.5rem;
-    font-weight: 700;
-}
-.dark-mode div:deep(.modal-content)  {
-    border-color: #2d3748;
-    background-color: #1a202c;
-}
-</style>

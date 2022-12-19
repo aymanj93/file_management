@@ -16,19 +16,21 @@
                     </thead>
                     <tbody>
                     <tr v-for="a in folder.attachment" :key="a.id" class="border-top">
-                        <td>{{ a.name }}</td>
+                        <td>
+                            <a download :href="'api/attachment/' + a.id">{{ a.name }}</a>
+                        </td>
                         <td>-</td>
                         <td>{{ a.uploaded }}</td>
                         <td>-</td>
-                        <td>0</td>
+                        <td> {{ a.size }} </td>
                     </tr>
                     </tbody>
                 </table>
-                <button class="flat btn border fw-bold mt-4"><i class="bi bi-file-earmark-arrow-up me-2"></i>Upload File</button>
+                <button @click="uploadFile(folder.id)" class="flat btn border fw-bold mt-4"><i class="bi bi-file-earmark-arrow-up me-2"></i>Upload File</button>
             </div>
             <div v-else class="text-center text-secondary py-5">
                 <h3 class="fw-light">There are no files in this folder</h3>
-                <button class="flat btn border fw-bold"><i class="bi bi-file-earmark-arrow-up me-2"></i>Upload File</button>
+                <button @click="uploadFile(folder.id)" class="flat btn border fw-bold"><i class="bi bi-file-earmark-arrow-up me-2"></i>Upload File</button>
             </div>
         </div>
         <div v-else class="text-center text-secondary py-5">
@@ -40,8 +42,10 @@
 
 <script>
 export default {
-    props: ['folder', 'loadPreview'],
-    methods: {
+    props: {
+        folder: Object,
+        loadPreview: Boolean,
+        uploadFile: Function,
     }
 }
 </script>

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name');
             $table->unsignedBigInteger('folder_id')->nullable();
             $table->string('path')->nullable();
+            $table->string('size')->nullable();
 
             $table->timestamps();
 

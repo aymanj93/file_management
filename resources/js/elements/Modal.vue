@@ -1,6 +1,6 @@
 <template>
     <vue-final-modal v-slot="{ params, close }" v-bind="$attrs" classes="modal-container" content-class="modal-content">
-         <div class="p-3">
+         <div class="px-3">
             <h5 class="text-center mb-4">{{ title }}</h5>
             <slot/>
 
@@ -17,11 +17,32 @@ export default {
     props: ['title'],
     inheritAttrs: false,
     emits: ['save', 'cancel'],
-    methods: {
-        uploadFile(){
-            this.document.file = this.$refs.file.files[0];
-        },
-    }
-
 }
 </script>
+
+<style scoped>
+:deep(.modal-container) {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+:deep(.modal-content) {
+    display: flex;
+    flex-direction: column;
+    margin: 0 1rem;
+    padding: 1rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.25rem;
+    background: #fff;
+    width: auto;
+
+}
+.modal__title {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+.dark-mode div:deep(.modal-content)  {
+    border-color: #2d3748;
+    background-color: #1a202c;
+}
+</style>

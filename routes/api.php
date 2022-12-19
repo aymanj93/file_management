@@ -21,6 +21,8 @@ Route::post('/folder', [FolderController::class, 'store']);
 Route::get('/folder/{id}', [AttachmentController::class, 'index']);
 Route::post('/folder/{id}', [AttachmentController::class, 'store']);
 
+Route::get('/attachment/{id}', [AttachmentController::class, 'download']);
+
 Route::post('/folder/{id}/createFolder', [FolderController::class, 'createFolder']);
 
 

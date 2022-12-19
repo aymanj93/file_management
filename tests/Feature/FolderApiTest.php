@@ -27,8 +27,7 @@ class FolderApiTest extends TestCase
     public function testCreateFiftyFolderApi() {
         for ($i = 1; $i <= 50; $i++ )
         {
-            $folder = Folder::factory()->create();
-            $response = $this->post('api/folder', $folder->toArray());
+            $response = $this->post('api/folder', ['name' => 'folder_'.$i]);
             $response->assertCreated();
         }
     }
@@ -37,8 +36,7 @@ class FolderApiTest extends TestCase
         $root = Folder::factory()->create();
         for ($i = 1; $i <= 50; $i++ )
         {
-            $folder = Folder::factory()->create();
-            $response = $this->post('api/folder/'.$root->id.'/createFolder', $folder->toArray());
+            $response = $this->post('api/folder/'.$root->id.'/createFolder', ['name' => 'subFolder_'.$i]);
             $response->assertCreated();
         }
 
