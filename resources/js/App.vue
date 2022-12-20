@@ -135,13 +135,17 @@ export default {
         },
         uploadFile(id) {
             this.$refs.file.value = null;
-            this.inputFileName = '';
 
+            this.inputFileName = '';
+            // console.log('controller: ' + this.uploadFileController.file, '|'+this.$refs.file.files[0])
             this.uploadFileController.id = id;
+            this.uploadFileController.name = '';
+            this.uploadFileController.file = null;
             this.uploadFileController.show = true;
             this.uploadFileController.maxSize = false;
             this.uploadFileController.fileEmpty = false;
             this.uploadFileController.errors = null;
+            this.uploadFileController.disabled = true;
         },
         showMenu(node) {
             this.toggleMenu(this.folders, node);
@@ -169,13 +173,15 @@ export default {
         handleFileUpload() {
             const file = this.$refs.file.files[0];
 
-            if (file.size > 5242880) {
+            if (file.size > 5542880) {
                 this.uploadFileController.maxSize = true;
                 this.uploadFileController.disabled = true;
             } else {
-                this.uploadFileController.maxSize = false;
-                this.uploadFileController.disabled = false;
                 this.uploadFileController.file = this.$refs.file.files[0];
+                if (this.uploadFileController.name !== '') {
+                    this.uploadFileController.maxSize = false;
+                    this.uploadFileController.disabled = false;
+                }
             }
         },
         toggleFolder (node) {
